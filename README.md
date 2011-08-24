@@ -165,6 +165,30 @@ Remove an entry using the `DELETE` method, as in:
 Which simply returns the words `OK`.
 
 
+What's Next
+===========
+
+Good question. Right now, if you were to set this up on a publically-accessible
+server, anyone could come along and with a simple `POST`, create an entry in any
+sort of *collection* ... including filling your disk.
+
+I've warned you time and time again to wipe your nose, and modify this code before
+doing anything else.
+
+This brings me to the top tasks that I'd like to add to this project soon so that
+when you clone this, you can easily configure it.
+
+Tasks
+-----
+
+  * Add a private `application id` string that needs to be passed in to verify
+    the client.
+  * Add an array somewhere of the *collections* that can be accessed.
+  * Add a notion of a *user account* that may or may not correspond to a Mongo
+    database.
+
+I'm sure we'll make this list longer if we think about it.
+
   [1]: http://www.nodejs.org
   [2]: http://www.mongodb.org
   [3]: http://howtonode.org/introduction-to-npm
