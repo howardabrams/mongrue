@@ -8,37 +8,47 @@ var responses = require("./responses");
 
 var port      = 8888;
 
+/*
+ * Starts the server and creates the `onRequest` handler.
+ * Each request is parsed and farmed off to the appropriate
+ * RESTful router.
+ */
 function start(route, handle) {
     function onRequest(request, response) {
-
-	var u        = url.parse(request.url, parseQueryString=true);
+        // Before we go off and do any routing, let's split out the
+        // request and get the "collection name" and the "id" ...
+        var u        = url.parse(request.url, parseQueryString=true);
 
         var parts      = u.pathname.split("/");
-	var collection = parts[1];
-	var id         = parts[2];
+        var collection = parts[1];
+        var id         = parts[2];
         // console.log(request.method + " request for " + id + " from " + collection);
 
-	request.setEncoding("utf8");
+        request.setEncoding("utf8");
+        // Hrm... node has a strange way of feeding us the body.
+        // Grab each chunk and shove it into the "body" variable.
+        var body = "";
+        request.addListener("data", function(bodyChunk) {
+            body += bodyChunk;
+        });
 
-	var body = "";
-	request.addListener("data", function(bodyChunk) {
-	    body += bodyChunk;
-	    console.log("Received POST data chunk '"+bodyChunk + "'.");
-	});
-
-	// When we are all done getting all of the body data, we then route it...
-	request.addListener("end", function() {
-	    try {
-		var jsonBody = "";
-		if (body.length > 0) {  // Let's not parse the body if none is given.
-		    jsonBody = JSON.parse(body);
-		}
-		route(handle, request.method, collection, id, u.query, jsonBody, response);
-	    }
-	    catch (error) {
-		responses.sendError(response, 400, "Could not parse body: " + error + " (Remember to use double quotes, instead of single quotes)");
-	    }
-	});
+        // When we are all done getting all of the body data,
+        // we parse the data into JSON, and route it based on
+        // "method" that was given to us.
+        request.addListener("end", function() {
+            try {
+                var jsonBody = "";
+                if (body.length > 0) {  // Let's not parse the body if none is given.
+                    jsonBody = JSON.parse(body);
+                }
+                route(handle, request.method, collection, id, u.query, jsonBody, response);
+            }
+            catch (error) {
+                responses.sendError(response, 400, 
+                                    "Could not parse body: " + error + 
+                                    " (Remember to use double quotes, instead of single quotes)");
+            }
+        });
     }
 
     http.createServer(onRequest).listen(port);
