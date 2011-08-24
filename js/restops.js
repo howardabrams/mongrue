@@ -1,5 +1,12 @@
 /*
- * A series of CRUD rest operations.
+ * A series of CRUD rest operations. The `exports` puts this
+ * into an array that allows us to route based on the HTTP
+ * method.
+ *
+ * Each method expects a reference to the MongoDB, and knows
+ * how to work the database based on RESTful expectations.
+ * Yeah, I have no idea what that comment means either. Just
+ * seeing if you are paying attention.
  */
 
 var util = require('util');
@@ -17,10 +24,10 @@ function readAll(response, collection, params) {
     var query = {}
     if (params.query) {
 	query=JSON.parse(params.query);
-	console.log("Query: "+query);
+        console.log("Query: "+query);
     }
     collection.find(query, params).toArray(function(err, items) {
-	responses.sendItems(response, items);
+        responses.sendItems(response, items);
     });
 }
 
@@ -32,20 +39,20 @@ function readAll(response, collection, params) {
  */
 function read(response, collection, id, query, body) {
     if ( id ) {
-	console.log("GET " + id + " FROM " + getDatabaseInfo(collection) );
-	
-	collection.find( getIdQuery(id) ).toArray(function(err, items) {
+        console.log("GET " + id + " FROM " + getDatabaseInfo(collection) );
+        
+        collection.find( getIdQuery(id) ).toArray(function(err, items) {
 
-	    if ( items && items[0] ) {
-		responses.sendItems(response, items[0]);
-	    }
-	    else {
-		responses.sendError(response, 404, "Not found by ID: " + id );
-	    } 		
-	});
+            if ( items && items[0] ) {
+                responses.sendItems(response, items[0]);
+            }
+            else {
+                responses.sendError(response, 404, "Not found by ID: " + id );
+            }                 
+        });
     }
     else {
-	readAll(response, collection, query, body);
+        readAll(response, collection, query, body);
     }
 }
 
@@ -63,12 +70,12 @@ function create(response, collection, id, query, body) {
     console.log("POST new " + getDatabaseInfo(collection) );
 
     collection.insert(body, {safe:true}, function(err, objects) {
-	if (err) {
-	    responses.sendDbError(response, err);
-	}
-	else {
-	    responses.sendItem(response, objects);
-	}
+        if (err) {
+            responses.sendDbError(response, err);
+        }
+        else {
+            responses.sendItem(response, objects);
+        }
     });
 }
 
@@ -84,12 +91,12 @@ function update(response, collection, id, query, body) {
     var sort = [];
     var options = {}
     collection.findAndModify(getIdQuery(id), sort, body, options, function(err, objects) {
-	if (err) {
-	    responses.sendDbError(response, err);
-	}
-	else {
-	    responses.sendItem(response, objects);
-	}
+        if (err) {
+            responses.sendDbError(response, err);
+        }
+        else {
+            responses.sendItem(response, objects);
+        }
     });
 }
 
@@ -101,7 +108,7 @@ function update(response, collection, id, query, body) {
 function remove(response, collection, id) {
     console.log("DELETE " + id + " FROM " + getDatabaseInfo(collection) );
     collection.remove( getIdQuery(id), function(err, result) {
-	responses.sendOK(response);
+        responses.sendOK(response);
     });
 }
 
@@ -123,27 +130,12 @@ exports.handle = handle;
  */
 function getIdQuery(id) {
     try {
-	var oid = new BSON.ObjectID(id);
-	return { "_id" : oid };
+        var oid = new BSON.ObjectID(id);
+        return { "_id" : oid };
     }
     catch (err) {
-	return { "id" : id - 0 };
+        return { "id" : id - 0 };
     }
-}
-
-/*
- * Parses the query parameters of the URL, and attempts to 
- * put together a descent MongoDB query object, like:
- * 
- * We should accept the following:
- *   sort:
- *   order:
- *   max:
- *   offset:
- *     {$set: {username: 'howard'}} 
- */
-function getQueryFromParams(params) {
-    
 }
 
 /**
