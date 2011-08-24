@@ -1,0 +1,155 @@
+/*
+ * A series of CRUD rest operations.
+ */
+
+var util = require('util');
+var BSON = require('mongodb').BSONPure;
+var responses = require('./responses');
+
+/**
+ * READ ALL
+ * --------
+ * Returns the entire collection requested.
+ * @TODO: Need to accept and process query parameters to limit what is returned.
+ */
+function readAll(response, collection, params) {
+    console.log("GET all FROM " + getDatabaseInfo(collection) );
+    var query = {}
+    if (params.query) {
+	query=JSON.parse(params.query);
+	console.log("Query: "+query);
+    }
+    collection.find(query, params).toArray(function(err, items) {
+	responses.sendItems(response, items);
+    });
+}
+
+/**
+ * READ ONE
+ * --------
+ * Given an ID, we need to look up an item in the collection,
+ * and return it.
+ */
+function read(response, collection, id, query, body) {
+    if ( id ) {
+	console.log("GET " + id + " FROM " + getDatabaseInfo(collection) );
+	
+	collection.find( getIdQuery(id) ).toArray(function(err, items) {
+
+	    if ( items && items[0] ) {
+		responses.sendItems(response, items[0]);
+	    }
+	    else {
+		responses.sendError(response, 404, "Not found by ID: " + id );
+	    } 		
+	});
+    }
+    else {
+	readAll(response, collection, query, body);
+    }
+}
+
+/**
+ * CREATE
+ * --------
+ * Creates a new entry based on a body containing a JSON
+ * document.
+ *
+ * Note: `id` and `query` will most likely be undefined, and 
+ *       are ignored.
+ */
+
+function create(response, collection, id, query, body) {
+    console.log("POST new " + getDatabaseInfo(collection) );
+
+    collection.insert(body, {safe:true}, function(err, objects) {
+	if (err) {
+	    responses.sendDbError(response, err);
+	}
+	else {
+	    responses.sendItem(response, objects);
+	}
+    });
+}
+
+/**
+ * UPDATE
+ * --------
+ * Given an ID and a body containing a new JSON document, 
+ * this will update an existing entry.
+ */
+function update(response, collection, id, query, body) {
+    console.log("PUT " + id + " FROM " + getDatabaseInfo(collection) );
+
+    var sort = [];
+    var options = {}
+    collection.findAndModify(getIdQuery(id), sort, body, options, function(err, objects) {
+	if (err) {
+	    responses.sendDbError(response, err);
+	}
+	else {
+	    responses.sendItem(response, objects);
+	}
+    });
+}
+
+/**
+ * DELETE
+ * --------
+ * Given an ID, this will delete an entry that matches.
+ */
+function remove(response, collection, id) {
+    console.log("DELETE " + id + " FROM " + getDatabaseInfo(collection) );
+    collection.remove( getIdQuery(id), function(err, result) {
+	responses.sendOK(response);
+    });
+}
+
+var handle = {};
+handle["GET"]    = read;
+handle["POST"]   = create;
+handle["PUT"]    = update;
+handle["DELETE"] = remove;
+
+exports.handle = handle;
+
+
+/**
+ * We want to be able to specify either the internal "_id" or
+ * object-specific "id" parameter. So, if we can convert the
+ * id value given to us into an ObjectID(), then we know which
+ * query we should build, otherwise, we assume it is the "id"
+ * property with an integer.
+ */
+function getIdQuery(id) {
+    try {
+	var oid = new BSON.ObjectID(id);
+	return { "_id" : oid };
+    }
+    catch (err) {
+	return { "id" : id - 0 };
+    }
+}
+
+/*
+ * Parses the query parameters of the URL, and attempts to 
+ * put together a descent MongoDB query object, like:
+ * 
+ * We should accept the following:
+ *   sort:
+ *   order:
+ *   max:
+ *   offset:
+ *     {$set: {username: 'howard'}} 
+ */
+function getQueryFromParams(params) {
+    
+}
+
+/**
+ * Given a Mongo database connection with collection reference,
+ * let's see if we can extract useful information to log.
+ */
+function getDatabaseInfo(db) {
+    return db.db.databaseName + "." + db.collectionName;
+}
