@@ -1,3 +1,9 @@
+/**
+ * This "router" is pretty simple, in that it opens up a connection to
+ * the MongoDB instance (on the localhost, mind you), and then calls
+ * the appropriate REST handler based on the method.
+ */
+
 var Db         = require('mongodb').Db,
     Connection = require('mongodb').Connection,
     Server     = require('mongodb').Server;
@@ -9,13 +15,12 @@ function route(handle, method, objname, id, query, body, response) {
 
     var db = new Db('test', new Server('localhost', Connection.DEFAULT_PORT, {}));
     db.open(function(err, db) {
-	db.collection(objname, function(err, collection) {
-	    handle[method](response, collection, id, query, body);
-	});
+        db.collection(objname, function(err, collection) {
+            handle[method](response, collection, id, query, body);
+        });
     });
   } 
   else {
-      console.log("No " + method + " request handler found for " + objname);
       responses.sendError(response, 405, "Method not supported: " + method);
   }
 }

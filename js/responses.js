@@ -1,3 +1,9 @@
+/**
+ * This module creates some *standard reponses* for
+ * typical behavior that we run across. This allows the
+ * errors to all act the same.
+ */
+
 var util = require('util');
 
 /**
@@ -6,19 +12,19 @@ var util = require('util');
  */
 function sendItems(response, items) {
     if (items) {
-	console.log("Sending: " + util.inspect(items, false, null));
+        console.log("Sending: " + util.inspect(items, false, null));
 
-	var body = JSON.stringify(items);
-	// response.setEncoding('utf8');
-	response.writeHead(200, {
-	    'Content-Length': body.length,
-	    // TODO: Replace with Buffer.byteLength()
-	    'Content-Type': 'application/json' });
-	response.write( body );
-	response.end();
+        var body = JSON.stringify(items);
+        // response.setEncoding('utf8');
+        response.writeHead(200, {
+            'Content-Length': body.length,
+            // TODO: Replace with Buffer.byteLength()
+            'Content-Type': 'application/json' });
+        response.write( body );
+        response.end();
     }
     else {
-	sendError(response, 404, "Nothing to return");
+        sendError(response, 404, "Nothing to return");
     }
 }
 
@@ -29,18 +35,18 @@ function sendItems(response, items) {
  */
 function sendItem(response, items) {
     if (items) {
-	if (items.length == 0) {
-	    sendOK(response);
-	}
-	else if (items.length == 1) {
-	    sendItems(response, items[0]);
-	}
-	else {
-	    sendItems(response, items);
-	}
+        if (items.length == 0) {
+            sendOK(response);
+        }
+        else if (items.length == 1) {
+            sendItems(response, items[0]);
+        }
+        else {
+            sendItems(response, items);
+        }
     }
     else {
-	sendOK(response);
+        sendOK(response);
     }
 }
 
@@ -63,10 +69,10 @@ function sendError(response, code, message) {
 function sendDbError(response, err) {
     console.warn(err.message);
     if (err.message.indexOf('E11000 ') !== -1) {
-	sendError(response, 406, "ID already taken. Try not specifying that.");
+        sendError(response, 406, "ID already taken. Try not specifying that.");
     }
     else {
-	responses.sendError(response, 400, "Database access error: " + err.message);
+        responses.sendError(response, 400, "Database access error: " + err.message);
     }
 }
 
