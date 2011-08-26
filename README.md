@@ -73,6 +73,18 @@ The code structure came from the [Node Beginner][4] website, so you may
 want to read that article before diving into the source.
 
 
+Project Tests
+-------------
+
+Since JavaScript has this interesting little feature called *cross-site domain calls*,
+it makes it pretty difficult to run QUnit tests in a browser when they test the
+results of our Mongrue project.
+
+So, if you request [http://localhost:8888/test](http://localhost:8888/test), you
+will start up the unit tests, which will call back to the server and perform 
+the unit tests in the `test.js` file.
+
+
 Using the Beast
 ===============
 
