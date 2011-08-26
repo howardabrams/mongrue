@@ -2,7 +2,6 @@
  * This file contains the configuration values for the
  * system.
  */
-
 exports.values = {
 
     // The port that this server listens for REST requests:
@@ -28,8 +27,8 @@ exports.values = {
     // An array of acceptable "collection" names. Each key must have a value
     // of 1 .. no more, no less.
     collectionNames: {
-	"unicorns": 1,
-	"vampires": 1
+	"unicorn": 1,
+	"vampire": 1
     }
 
 };
