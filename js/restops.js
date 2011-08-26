@@ -28,6 +28,7 @@ function readAll(response, collection, params) {
     }
     collection.find(query, params).toArray(function(err, items) {
         responses.sendItems(response, items);
+	collection.db.close();
     });
 }
 
@@ -49,6 +50,7 @@ function read(response, collection, id, query, body) {
             else {
                 responses.sendError(response, 404, "Not found by ID: " + id );
             }                 
+	    collection.db.close();
         });
     }
     else {
@@ -69,13 +71,14 @@ function read(response, collection, id, query, body) {
 function create(response, collection, id, query, body) {
     console.log("POST new " + getDatabaseInfo(collection) );
 
-    collection.insert(body, {safe:true}, function(err, objects) {
+    collection.insert(body, function(err, objects) { // , {safe:true}
         if (err) {
             responses.sendDbError(response, err);
         }
         else {
             responses.sendItem(response, objects);
         }
+	collection.db.close();
     });
 }
 
@@ -97,6 +100,7 @@ function update(response, collection, id, query, body) {
         else {
             responses.sendItem(response, objects);
         }
+	collection.db.close();
     });
 }
 
@@ -109,6 +113,7 @@ function remove(response, collection, id) {
     console.log("DELETE " + id + " FROM " + getDatabaseInfo(collection) );
     collection.remove( getIdQuery(id), function(err, result) {
         responses.sendOK(response);
+	collection.db.close();
     });
 }
 

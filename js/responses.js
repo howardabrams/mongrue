@@ -72,7 +72,7 @@ function sendDbError(response, err) {
         sendError(response, 406, "ID already taken. Try not specifying that.");
     }
     else {
-        responses.sendError(response, 400, "Database access error: " + err.message);
+        sendError(response, 400, "Database access error: " + err.message);
     }
 }
 
@@ -86,8 +86,21 @@ function sendOK(response) {
     response.end();
 }
 
+/**
+ * This function sends some arbitrary HTML gunk.
+ */
+function sendFile(response, type, data) {
+
+    response.writeHead(200, {
+            'Content-Length': data.length,
+            'Content-Type': type });
+    response.write( data );
+    response.end();
+}
+
 exports.sendItems   = sendItems;
 exports.sendItem    = sendItem;
 exports.sendOK      = sendOK;
 exports.sendError   = sendError;
 exports.sendDbError = sendDbError;
+exports.sendFile    = sendFile;

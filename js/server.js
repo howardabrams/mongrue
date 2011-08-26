@@ -5,6 +5,7 @@
 var http      = require("http");
 var url       = require("url");
 var responses = require("./responses");
+var fs        = require('fs');
 
 /*
  * Starts the server and creates the `onRequest` handler.
@@ -27,6 +28,36 @@ function start(route, handle, config) {
         // Before we go off and do any routing, let's split out the
         // request and get the "collection name" and the "id" ...
         var u        = url.parse(request.url, parseQueryString=true);
+
+	// If the path is "tests", then we return the QUnit tests. This allows
+	// us to get around the cross-domain scripting sandbox that browsers
+	// put us in.
+	console.log("Requested: " + u.pathname);
+
+	if (u.pathname == "/favicon.ico") {
+	    responses.sendOK(response);
+	    return;
+	}
+
+	if (u.pathname.indexOf('/test') == 0) {
+	    var file = u.pathname.substring(1);
+	    if (file == 'test') {
+		file = 'test/index.html';
+	    }
+	    var type = "text/html";
+	    if (/\.js$/.test(file)) {
+		type = "text/javascript";
+	    }
+	    else if (/\.css$/.test(file)) {
+		type = "text/css";
+	    }
+	    fs.readFile(file, 'utf8', function (err, data) {
+		if (err) throw err;
+		responses.sendFile(response, type, data);
+		return;
+	    });
+	    return;
+	}
 
         var parts      = u.pathname.split("/");
         var collection = parts[1];
