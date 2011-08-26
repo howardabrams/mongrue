@@ -9,14 +9,15 @@ var Db         = require('mongodb').Db,
     Server     = require('mongodb').Server;
 var responses  = require('./responses');
 
-function route(handle, method, objname, id, query, body, response) {
+function route(handle, method, objname, id, query, body, response, config) {
 
   if (typeof handle[method] === 'function') {
 
-    var db = new Db('test', new Server('localhost', Connection.DEFAULT_PORT, {}));
+    var db = new Db(config.mongoDatabase, 
+		    new Server(config.mongoHostname, Connection.DEFAULT_PORT, {}));
     db.open(function(err, db) {
         db.collection(objname, function(err, collection) {
-            handle[method](response, collection, id, query, body);
+            handle[method](response, collection, id, query, body, config);
         });
     });
   } 

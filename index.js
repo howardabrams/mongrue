@@ -8,5 +8,6 @@
 var server  = require("./js/server");
 var router  = require("./js/router");
 var restops = require("./js/restops");
+var config  = require("./config");
 
-server.start(router.route, restops.handle);
+server.start(router.route, restops.handle, config.values);

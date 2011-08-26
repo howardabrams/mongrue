@@ -49,11 +49,28 @@ to do to get the server going, is:
 
     $ node index.js
 
-Yeah, that's it. Not only is it a simple program, it is intended that
-you'll want to modify it... *significantly*.
+But before you run it, you might want to edit the `config.js` file:
+
+    $ vi config.js
+
+This file contains the configuration values. Note the two most important
+ones that I tacked on to the end of that file:
+
+  * `clientKey`: If this is set (and I suggest you uncomment it), every
+    client request must include a `x-mongrue-clientkey` HTTP header with
+    a value that corresponds to that key. Just a wee bit of a safety check.
+
+  * `collectionNames`: This contains a list of the acceptable *collections*
+    (that is MongoDB parlance for the REST concept of *resources*). For
+    instance, `http://localhost:8888/unicorns` will work if this contains a
+    `unicorns` property that is set to `1`.
+
+REMEMBER: This project is really a *template project*. It is intended that
+you'll want to modify it... *significantly*. This is just a kick starter for
+your own creation.
 
 The code structure came from the [Node Beginner][4] website, so you may
-want to read that article.
+want to read that article before diving into the source.
 
 
 Using the Beast
@@ -168,22 +185,21 @@ Which simply returns the words `OK`.
 What's Next
 ===========
 
-Good question. Right now, if you were to set this up on a publically-accessible
-server, anyone could come along and with a simple `POST`, create an entry in any
-sort of *collection* ... including filling your disk.
-
 I've warned you time and time again to wipe your nose, and modify this code before
-doing anything else.
+doing anything else. This project really is a *template* for you to use to do something
+with. Don't expect that you can just modify the `config.js` file and it will give you
+what you need.
 
-This brings me to the top tasks that I'd like to add to this project soon so that
-when you clone this, you can easily configure it.
+However, this brings me to the top tasks that I'd like to add to this project so that
+it is more useful out of the box.
 
 Tasks
 -----
 
+  * Add a `config.js` file that can be use to specify application properties. @done
   * Add a private `application id` string that needs to be passed in to verify
-    the client.
-  * Add an array somewhere of the *collections* that can be accessed.
+    the client. @done
+  * Add an array somewhere of the *collections* that can be accessed. @done
   * Add a notion of a *user account* that may or may not correspond to a Mongo
     database.
 

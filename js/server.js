@@ -6,21 +6,37 @@ var http      = require("http");
 var url       = require("url");
 var responses = require("./responses");
 
-var port      = 8888;
-
 /*
  * Starts the server and creates the `onRequest` handler.
  * Each request is parsed and farmed off to the appropriate
  * RESTful router.
  */
-function start(route, handle) {
+function start(route, handle, config) {
+
     function onRequest(request, response) {
+
+	// Let's check to make sure the connect client is even allowed
+	// to play in our party room.
+	if ( config.clientKey ) {
+	    if (request.headers['x-mongrue-clientkey'] != config.clientKey) {
+		responses.sendError(response, 403, 
+                                "Invalid client authentication.");
+		return;
+	    }
+	}
         // Before we go off and do any routing, let's split out the
         // request and get the "collection name" and the "id" ...
         var u        = url.parse(request.url, parseQueryString=true);
 
         var parts      = u.pathname.split("/");
         var collection = parts[1];
+
+	if ( config.collectionNames[collection] != 1 ) {
+            responses.sendError(response, 400, 
+                                "The resource, " + collection + ", is unavailable. ");
+	    return;
+	}
+
         var id         = parts[2];
         // console.log(request.method + " request for " + id + " from " + collection);
 
@@ -41,7 +57,7 @@ function start(route, handle) {
                 if (body.length > 0) {  // Let's not parse the body if none is given.
                     jsonBody = JSON.parse(body);
                 }
-                route(handle, request.method, collection, id, u.query, jsonBody, response);
+                route(handle, request.method, collection, id, u.query, jsonBody, response, config);
             }
             catch (error) {
                 responses.sendError(response, 400, 
@@ -51,8 +67,8 @@ function start(route, handle) {
         });
     }
 
-    http.createServer(onRequest).listen(port);
-    console.log("Server has started on port: " + port);
+    http.createServer(onRequest).listen(config.port);
+    console.log("Server has started on port: " + config.port);
 }
 
 exports.start = start;
