@@ -25,10 +25,11 @@ exports.values = {
 
 
     // An array of acceptable "collection" names. Each key must have a value
-    // of 1 .. no more, no less.
+    // of true. If this section is commented out, then any collection/resource
+    // can be used.
     collectionNames: {
-	"unicorn": 1,
-	"vampire": 1
+	"unicorn": true,
+	"vampire": true
     }
 
 };

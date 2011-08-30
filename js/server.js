@@ -29,15 +29,15 @@ function start(route, handle, config) {
         // request and get the "collection name" and the "id" ...
         var u        = url.parse(request.url, parseQueryString=true);
 
-	// If the path is "tests", then we return the QUnit tests. This allows
-	// us to get around the cross-domain scripting sandbox that browsers
-	// put us in.
-	console.log("Requested: " + u.pathname);
-
 	if (u.pathname == "/favicon.ico") {
 	    responses.sendOK(response);
 	    return;
 	}
+
+	// If the path is "tests", then we return the QUnit tests. This allows
+	// us to get around the cross-domain scripting sandbox that browsers
+	// put us in.
+	console.log("Requested: " + u.pathname);
 
 	if (u.pathname.indexOf('/test') == 0) {
 	    var file = u.pathname.substring(1);
@@ -62,7 +62,7 @@ function start(route, handle, config) {
         var parts      = u.pathname.split("/");
         var collection = parts[1];
 
-	if ( config.collectionNames[collection] != 1 ) {
+	if ( config.collectionNames && !config.collectionNames[collection] ) {
             responses.sendError(response, 400, 
                                 "The resource, " + collection + ", is unavailable. ");
 	    return;
