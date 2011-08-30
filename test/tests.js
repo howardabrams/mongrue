@@ -175,6 +175,27 @@ $(document).ready(function(){
     	});
     });
 
+    module("Mongrue negative/security testsing");
+
+    asyncTest("Make sure that we can not access squirrels", 1, function() {
+	stop(2000);
+
+	$.ajax({
+	    type: 'POST',
+	    url: '/squirrel',
+	    data: JSON.stringify( {name:"Rocky"} ),
+	    contentType: 'application/json',
+	    error: function errorHandler(jqXHR, textStatus, errorThrown) {
+		equal(400, jqXHR.status, "Good, we couldn't store a squirrel.");
+		start();
+	    },
+	    success: function(results, textStatus) {
+		console.log("Updated a specific 'Duncan' unicorn.");
+		ok(false, "We were able to store a squirrel.");
+		start();
+	    }
+	});
+    });
 });
 
 function setupUnicorns(finalCallback)
