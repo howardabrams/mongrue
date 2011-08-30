@@ -72,6 +72,68 @@ $(document).ready(function(){
 	});
     });
 
+    asyncTest("Upsert a 'unicorn' entry", 3, function() {
+	var id = "4e5d0dd3750f46281403001a";
+	var duncan = {
+	    name : "Duncan",
+	    dob: "1993-06-03T19:00:00.000Z", // new Date(1993, 5, 3, 12, 0), 
+	    loves: ["brocolli", "spinach"], 
+	    weight: 460, 
+	    gender: 'm', 
+	    vampires: 23
+	};
+	var urlid = url + "/" + id;
+
+	    stop(3000);
+
+	var upsertTest = function() {
+	    console.log("Should we stop here?");
+	    $.ajax({
+		type: 'POST',
+		url: urlid,
+		data: JSON.stringify(duncan),
+		contentType: 'application/json',
+		error: errorHandler,
+		success: function(results, textStatus) {
+		    console.log("Created a specific 'Duncan' unicorn.");
+		    equal(results, "OK", "The unicorn 'duncan' matches what we expected.");
+
+		    // Let's post a second time, and make sure we can change something.
+		    duncan.weight = 630;
+
+		    $.ajax({
+			type: 'POST',
+			url: urlid,
+			data: JSON.stringify(duncan),
+			contentType: 'application/json',
+			error: errorHandler,
+			success: function(results, textStatus) {
+			    console.log("Updated a specific 'Duncan' unicorn.");
+			    equal(results, "OK", "The unicorn 'duncan' was updated.");
+
+			    $.getJSON(urlid, function(details) {
+				console.log("Read our unicorn: ", details);
+				duncan._id = id;
+				deepEqual(details, duncan, "Our updated unicorn matches.");
+				start();
+			    });
+			}
+		    });
+		}
+	    });
+	}
+
+	console.log("Time to make sure the unicorn doesn't exist.");
+
+	$.ajax({
+	    type: 'DELETE',
+	    url: urlid,
+	    error: upsertTest,
+	    success: upsertTest
+	});
+    });
+
+
     module("Mongrue complete tests");
 
     asyncTest("Get a list of unicorns", 4, function() {

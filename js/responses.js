@@ -78,9 +78,11 @@ function sendDbError(response, err) {
  * response (a non-error)?
  */
 function sendOK(response) {
-    response.writeHead(200, {"Content-Type": "text/plain"});
-    response.write("OK");
-    response.end();
+    var body = 'OK';
+    response.writeHead(200, {
+	'Content-Length': body.length,
+	'Content-Type': 'text/plain' });
+    response.end(body);
 }
 
 /**

@@ -71,7 +71,8 @@ function read(response, collection, id, query, body) {
 function create(response, collection, id, query, body) {
     console.log("POST new " + getDatabaseInfo(collection) );
 
-    collection.insert(body, function(err, objects) { // , {safe:true}
+    var options = {safe:true}
+    collection.insert(body, options, function(err, objects) {
         if (err) {
             responses.sendDbError(response, err);
         }
@@ -92,7 +93,7 @@ function update(response, collection, id, query, body) {
     console.log("PUT " + id + " FROM " + getDatabaseInfo(collection) );
 
     var sort = [];
-    var options = {}
+    var options = {safe:true}
     collection.findAndModify(getIdQuery(id), sort, body, options, function(err, objects) {
         if (err) {
             responses.sendDbError(response, err);
@@ -103,6 +104,29 @@ function update(response, collection, id, query, body) {
 	collection.db.close();
     });
 }
+
+/**
+ * UPSERT
+ * --------
+ * Given an ID and a body containing a new JSON document, 
+ * this will update an existing entry or insert a new one
+ * if the ID was not found. Called from a POST with ID.
+ */
+function upsert(response, collection, id, query, body) {
+    console.log("POST " + id + " FROM " + getDatabaseInfo(collection) );
+
+    var options = {upsert:true, safe:true, multi:false}
+    collection.update(getIdQuery(id), {$set: body}, options, function(err, count) {
+        if (err || count != 1) {
+            responses.sendDbError(response, err);
+        }
+        else {
+            responses.sendOK(response);
+        }
+	collection.db.close();
+    });
+}
+
 
 /**
  * DELETE
@@ -122,6 +146,7 @@ handle["GET"]    = read;
 handle["POST"]   = create;
 handle["PUT"]    = update;
 handle["DELETE"] = remove;
+handle["UPSERT"] = upsert;
 
 exports.handle = handle;
 

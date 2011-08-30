@@ -17,7 +17,10 @@ function route(handle, method, objname, id, query, body, response, config) {
 		    new Server(config.mongoHostname, Connection.DEFAULT_PORT, {}));
     db.open(function(err, db) {
         db.collection(objname, function(err, collection) {
-            handle[method](response, collection, id, query, body, config);
+	    if (method == 'POST' && id) {
+		method = 'UPSERT';
+	    }
+	    handle[method](response, collection, id, query, body, config);
         });
     });
   } 
