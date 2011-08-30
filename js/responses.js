@@ -15,13 +15,10 @@ function sendItems(response, items) {
         console.log("Sending: " + util.inspect(items, false, null));
 
         var body = JSON.stringify(items);
-        // response.setEncoding('utf8');
         response.writeHead(200, {
             'Content-Length': body.length,
-            // TODO: Replace with Buffer.byteLength()
             'Content-Type': 'application/json' });
-        response.write( body );
-        response.end();
+        response.end(body);
     }
     else {
         sendError(response, 404, "Nothing to return");
@@ -91,11 +88,12 @@ function sendOK(response) {
  */
 function sendFile(response, type, data) {
 
+    var body = new Buffer(data);
+
     response.writeHead(200, {
-            'Content-Length': data.length,
+            'Content-Length': body.length,
             'Content-Type': type });
-    response.write( data );
-    response.end();
+    response.end(data);
 }
 
 exports.sendItems   = sendItems;

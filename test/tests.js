@@ -10,7 +10,7 @@ $.ajaxSetup({
 $(document).ready(function(){  
     module("Mongrue sanity tests");
 
-    asyncTest("Create a 'unicorn' entry", 6, function() {
+    asyncTest("Create a 'unicorn' entry", 10, function() {
 	var daisy = {
 	    name : "Daisy",
 	    dob: new Date(1992, 10, 2, 13, 0), 
@@ -20,8 +20,8 @@ $(document).ready(function(){
 	    vampires: 3
 	};
 
-	stop();
 	console.log("Let's get this test started, shall we?");
+	stop(3000);
 
 	$.ajax({
 	    type: 'POST',
@@ -32,13 +32,18 @@ $(document).ready(function(){
 	    error: errorHandler,
 	    success: function(results, textStatus) {
 		console.log("Created a unicorn: " + results.name);
-		equal(results.name, daisy.name, "Created a unicorn");
+		// Can't do a deepEqual since the results has an extra _id field:
+		equal(results.name,      daisy.name,     "The unicorn 'name' field matches what we expected.");
+		deepEqual(new Date(results.dob),   daisy.dob,      "The unicorn 'dob' field matches what we expected.");
+		deepEqual(results.loves, daisy.loves,    "The unicorn 'loves' field matches what we expected.");
+		equal(results.weight,    daisy.weight,   "The unicorn 'weight' field matches what we expected.");
+		equal(results.gender,    daisy.gender,   "The unicorn 'gender' field matches what we expected.");
+		equal(results.vampires,  daisy.vampires, "The unicorn 'vampire' field matches what we expected.");
 		var urlid = url + "/" + results._id;
 
 		$.getJSON(urlid, function(details) {
 		    console.log("Read our unicorn: " + details.name);
-		    equal(details.name, daisy.name, "Read our unicorn");
-		    equal(details._id, results._id, "Our unicorn has the right ID value");
+		    deepEqual(details, results, "Read our unicorn");
 
 		    daisy.name = "Derek";
 		    daisy.gender = "m";
