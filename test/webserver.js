@@ -1,5 +1,6 @@
-var fs        = require('fs');
-var path = require('path');
+var fs     = require('fs');
+var path   = require('path');
+var config = require('../config');
 
 /**
  * This checks that a given HTTP pathname is available to
@@ -26,6 +27,16 @@ function sendWebfile(response, filepath)
 {
     var file = filepath.substring(1);
 
+    // If an initial directory is specified (one without an '.'
+    // extension or a slash), then redirect to a directory with
+    // a trailing slash.
+    if (!/[\.\/]/.test(file)) {
+        response.writeHead(302, {
+           "Location": "http://localhost:"+config.values.port+"/" + file + "/"
+        });
+        response.end();
+        return;
+    }
     // End in a slash? Serve up the index.html file...
     if (/\/$/.test(file)) {
         file = file + 'index.html';
