@@ -1,18 +1,19 @@
 var fs        = require('fs');
+var path = require('path');
 
 /**
  * This checks that a given HTTP pathname is available to
  * be served by the web server function, as given by the
  * pages object.
  */
-function available(pages, path)
+function available(pages, filepath)
 {
     if (pages) {
-	for (page in pages) {
-	    if ( path.indexOf(page) == 0) {
-		return true;
-	    }
-	}
+        for (page in pages) {
+            if (filepath.indexOf(page) == 0) {
+                return true;
+            }
+        }
     }
     return false;
 }
@@ -21,45 +22,58 @@ function available(pages, path)
  * Attempts to figure out what the content type of the requested
  * file is, and sends it using our 
  */
-function sendWebfile(response, path) 
+function sendWebfile(response, filepath) 
 {
-    var file = path.substring(1);
+    var file = filepath.substring(1);
 
     // End in a slash? Serve up the index.html file...
     if (/\/$/.test(file)) {
-	file = file + 'index.html';
+        file = file + 'index.html';
     }
-	
+
     var type = "text/html";
-    if (/\.js$/.test(file)) {
-	type = "text/javascript";
+    var extname = path.extname(file);
+    switch (extname) {
+        case '.js':
+            type = 'text/javascript';
+            break;
+        case '.css':
+            type = 'text/css';
+            break;
     }
-    else if (/\.css$/.test(file)) {
-	type = "text/css";
-    }
-    
-    try {
-	fs.readFile(file, 'utf8', function (err, data) {
-	    if (err) throw err;
-	    sendFile(response, type, data);
-	});
-    }
-    catch (e) {
-	response.writeHead(404);
-	response.end();
-    }
+
+    path.exists(file, function(exists) {
+        if (exists) {
+            fs.readFile(file, 'utf8', function (err, data) {
+                if (err) {
+                    response.writeHead(500);
+                    response.end();                        
+                }
+                sendFile(response, type, data);
+            });
+        }
+        else {
+            response.writeHead(404);
+            response.end();            
+        }
+    });
 }
 
 /**
  * This function sends some arbitrary HTML gunk.
  */
 function sendFile(response, type, data) {
-
-    var body = new Buffer(data);
+    var body;
+    if (data) {
+        body = new Buffer(data);
+    }
+    else {
+        body = new Buffer();
+    }
 
     response.writeHead(200, {
-            'Content-Length': body.length,
-            'Content-Type': type });
+        'Content-Length': body.length,
+        'Content-Type': type });
     response.end(data);
 }
 
