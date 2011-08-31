@@ -30,6 +30,15 @@ exports.values = {
     collectionNames: {
 	"unicorn": true,
 	"vampire": true
-    }
+    },
 
+    // Mongrue is NOT a web server, but in order to use jQuery's QUnit as
+    // a testing framework, I need to server up some web server pages. Since
+    // I do not want to depend on the excellent "collection" package (or any
+    // thing similar), I put together a simple 10 line web server that serves
+    // non-image files in any directory listed below:
+
+    serverPages: {
+	"/test": true   // Oh yeah, the initial slashes are important.
+    }
 };
