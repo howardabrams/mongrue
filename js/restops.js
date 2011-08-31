@@ -21,7 +21,7 @@ var responses = require('./responses');
  */
 function readAll(response, collection, params) {
     console.log("GET all FROM " + getDatabaseInfo(collection) );
-    var query = {}
+    var query = {};
     if (params.query) {
 	query=JSON.parse(params.query);
         console.log("Query: "+query);
@@ -71,7 +71,7 @@ function read(response, collection, id, query, body) {
 function create(response, collection, id, query, body) {
     console.log("POST new " + getDatabaseInfo(collection) );
 
-    var options = {safe:true}
+    var options = {safe:true};
     collection.insert(body, options, function(err, objects) {
         if (err) {
             responses.sendDbError(response, err);
@@ -93,7 +93,7 @@ function update(response, collection, id, query, body) {
     console.log("PUT " + id + " FROM " + getDatabaseInfo(collection) );
 
     var sort = [];
-    var options = {safe:true}
+    var options = {safe:true};
     collection.findAndModify(getIdQuery(id), sort, body, options, function(err, objects) {
         if (err) {
             responses.sendDbError(response, err);
@@ -115,7 +115,7 @@ function update(response, collection, id, query, body) {
 function upsert(response, collection, id, query, body) {
     console.log("POST " + id + " FROM " + getDatabaseInfo(collection) );
 
-    var options = {upsert:true, safe:true, multi:false}
+    var options = {upsert:true, safe:true, multi:false};
     collection.update(getIdQuery(id), {$set: body}, options, function(err, count) {
         if (err || count != 1) {
             responses.sendDbError(response, err);

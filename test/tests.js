@@ -2,8 +2,8 @@ var url = "/unicorn";
 
 $.ajaxSetup({
     headers: {
-	'x-mongrue-clientkey': 'dsk38dslgkhsgtsl'
-    },
+        'x-mongrue-clientkey': 'dsk38dslgkhsgtsl'
+    }
 });
 
 
@@ -121,7 +121,7 @@ $(document).ready(function(){
 		    });
 		}
 	    });
-	}
+	};
 
 	console.log("Time to make sure the unicorn doesn't exist.");
 
