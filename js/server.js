@@ -5,7 +5,7 @@
 var http      = require("http");
 var url       = require("url");
 var responses = require("./responses");
-var fs        = require('fs');
+var webserver = require('../test/webserver');
 
 /*
  * Starts the server and creates the `onRequest` handler.
@@ -37,25 +37,9 @@ function start(route, handle, config) {
 	// If the path is "tests", then we return the QUnit tests. This allows
 	// us to get around the cross-domain scripting sandbox that browsers
 	// put us in.
-	console.log("Requested: " + u.pathname);
-
-	if (u.pathname.indexOf('/test') == 0) {
-	    var file = u.pathname.substring(1);
-	    if (file == 'test') {
-		file = 'test/index.html';
-	    }
-	    var type = "text/html";
-	    if (/\.js$/.test(file)) {
-		type = "text/javascript";
-	    }
-	    else if (/\.css$/.test(file)) {
-		type = "text/css";
-	    }
-	    fs.readFile(file, 'utf8', function (err, data) {
-		if (err) throw err;
-		responses.sendFile(response, type, data);
-		return;
-	    });
+	if ( webserver.available(config.serverPages, u.pathname) ) {
+	    console.log("Requested: " + u.pathname);
+	    webserver.sendWebfile(response, u.pathname);
 	    return;
 	}
 
