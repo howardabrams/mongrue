@@ -85,22 +85,8 @@ function sendOK(response) {
     response.end(body);
 }
 
-/**
- * This function sends some arbitrary HTML gunk.
- */
-function sendFile(response, type, data) {
-
-    var body = new Buffer(data);
-
-    response.writeHead(200, {
-            'Content-Length': body.length,
-            'Content-Type': type });
-    response.end(data);
-}
-
 exports.sendItems   = sendItems;
 exports.sendItem    = sendItem;
 exports.sendOK      = sendOK;
 exports.sendError   = sendError;
 exports.sendDbError = sendDbError;
-exports.sendFile    = sendFile;
