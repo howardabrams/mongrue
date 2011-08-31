@@ -80,9 +80,9 @@ Since JavaScript has this interesting little feature called *cross-site domain c
 it makes it pretty difficult to run QUnit tests in a browser when they test the
 results of our Mongrue project.
 
-So, if you request [http://localhost:8888/test](http://localhost:8888/test), you
+So, if you request [http://localhost:8888/test/](http://localhost:8888/test/), you
 will start up the unit tests, which will call back to the server and perform 
-the unit tests in the `test.js` file.
+the unit tests in the `test.js` file. (Oh yeah, that final slash is important).
 
 
 Using the Beast
