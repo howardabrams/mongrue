@@ -82,8 +82,8 @@ function start(route, handle, config) {
         });
     }
 
-    http.createServer(onRequest).listen(config.port);
-    console.log("Server has started on port: " + config.port);
+    http.createServer(onRequest).listen(config.port, config.host);
+    console.log("Server has started on port: " + config.host + ":" + config.port);
 }
 
 exports.start = start;

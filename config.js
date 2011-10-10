@@ -2,10 +2,15 @@
  * This file contains the configuration values for the
  * system.
  */
+// Working within CloudFoundry's environment could be pretty cool,
+// so let's check for it:
 exports.values = {
+ 
+	// The host that this server attaches to. Normally, localhost:
+	host : (process.env.VCAP_APP_HOST || 'localhost'),
 
     // The port that this server listens for REST requests:
-    port: 8888,
+    port: Number(process.env.VMC_APP_PORT || 8888),
 
     // The hostname of the MongoDB instance.
     mongoHostname: "localhost",
